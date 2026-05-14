@@ -1,7 +1,7 @@
 import json
 import boto3
 
-def read_from_s3(event):
+def get_s3_object_from_event(event):
     s3 = boto3.client("s3")
 
     record = event["Records"][0]

@@ -1,9 +1,11 @@
 import logging
-from config import log_file
+from config.settings import get_config
 
 def logging_configuration():
 
-    if not log_file:
+    config = get_config()
+
+    if not config["log_file"]:
         print("ERROR: LOG_FILE_PATH is not set or is none!")
         return logging.getLogger()
 
@@ -12,7 +14,7 @@ def logging_configuration():
             level=logging.INFO,
             format="%(asctime)s:%(levelname)s:%(message)s",
             handlers=[
-                logging.FileHandler(filename=log_file, mode="a"),
+                logging.FileHandler(filename=config["log_file"], mode="a"),
                 logging.StreamHandler(),
             ],
         )
@@ -24,11 +26,11 @@ def logging_configuration():
         return logger
 
     except PermissionError:
-        logging.warning(f"Permission denied: Cannot write to {log_file}.")
+        logging.warning(f"Permission denied: Cannot write to {config["log_file"]}.")
         return logging.getLogger()
 
     except FileNotFoundError:
-        logging.warning(f"File path not found: {log_file}")
+        logging.warning(f"File path not found: {config["log_file"]}")
         return logging.getLogger()
 
     except Exception as e:

@@ -1,19 +1,18 @@
 import json
 import logging
 import boto3
-from config import bucket_name, key
 
 logger = logging.getLogger(__name__)
 
-def write_to_s3(api_data):
+def load_to_s3(api_data, config):
     try:
         logger.info("Beginning API data loading to S3...")
 
         s3 = boto3.client("s3")
 
         s3.put_object(
-            Bucket=bucket_name,
-            Key=key,
+            Bucket=config["bucket_name"],
+            Key=config["key"],
             Body=json.dumps(api_data).encode("UTF-8")
         )
 

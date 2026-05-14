@@ -21,7 +21,7 @@ def transform_data(api_data):
     df["name"] = df["name"].str.strip()
     df["normalized_name"] = df["normalized_name"].str.strip().str.lower()
 
-    # Normalize + map gender (vectorized, null-safe)
+    # Normalize + map gender
     df["gender"] = (
         df["gender"]
         .str.lower()
