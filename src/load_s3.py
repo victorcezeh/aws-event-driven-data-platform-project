@@ -4,6 +4,7 @@ import boto3
 
 logger = logging.getLogger(__name__)
 
+
 def load_to_s3(api_data, config):
     try:
         logger.info("Beginning API data loading to S3...")
@@ -13,7 +14,7 @@ def load_to_s3(api_data, config):
         s3.put_object(
             Bucket=config["bucket_name"],
             Key=config["key"],
-            Body=json.dumps(api_data).encode("UTF-8")
+            Body=json.dumps(api_data).encode("UTF-8"),
         )
 
         logger.info("API data loaded successfully into S3")

@@ -5,6 +5,7 @@ from src.extract import fetch_api_data
 from src.transform import transform_data
 from src.load_s3 import load_to_s3
 
+
 def main():
 
     config = get_config()
@@ -30,6 +31,7 @@ def main():
         logger.info("Local files saved")
 
     logger.info("Pipeline completed successfully")
+
 
 if __name__ == "__main__":
     main()

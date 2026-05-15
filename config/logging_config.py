@@ -1,6 +1,7 @@
 import logging
 from config.settings import get_config
 
+
 def logging_configuration():
 
     config = get_config()

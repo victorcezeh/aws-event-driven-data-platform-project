@@ -3,6 +3,7 @@ import pandas as pd
 
 logger = logging.getLogger(__name__)
 
+
 def transform_data(api_data):
     if not api_data:
         logger.warning("No data to transform")
@@ -23,10 +24,7 @@ def transform_data(api_data):
 
     # Normalize + map gender
     df["gender"] = (
-        df["gender"]
-        .str.lower()
-        .str.strip()
-        .map({"m": "male", "f": "female"})
+        df["gender"].str.lower().str.strip().map({"m": "male", "f": "female"})
     )
 
     # Fix known bad row

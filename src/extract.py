@@ -3,6 +3,7 @@ import requests
 
 logger = logging.getLogger(__name__)
 
+
 def fetch_api_data(api_url):
     try:
         response = requests.get(api_url)
