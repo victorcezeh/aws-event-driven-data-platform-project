@@ -76,3 +76,44 @@ Resources:
       SubnetIds:
         - !Ref SubnetPrivateA
       PrivateDnsEnabled: true
+
+  CloudWatchLogsInterfaceEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.logs
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref SubnetPrivateA
+        - !Ref SubnetPrivateB
+      PrivateDnsEnabled: true
+
+  SNSInterfaceEndpoint:
+    Type: AWS::EC2::VPCEndpoint
+    Properties:
+      VpcId: !Ref VPC
+      ServiceName: !Sub com.amazonaws.${AWS::Region}.sns
+      VpcEndpointType: Interface
+      SubnetIds:
+        - !Ref SubnetPrivateA
+        - !Ref SubnetPrivateB
+      PrivateDnsEnabled: true
+
+Outputs:
+  VpcId:
+    Description: VPC ID
+    Value: !Ref VPC
+    Export:
+      Name: data-platform-vpc-id
+
+  SubnetPrivateAId:
+    Description: Private Subnet AZ-A ID
+    Value: !Ref SubnetPrivateA
+    Export:
+      Name: data-platform-subnet-private-a
+
+  SubnetPrivateBId:
+    Description: Private Subnet AZ-B ID
+    Value: !Ref SubnetPrivateB
+    Export:
+      Name: data-platform-subnet-private-b
