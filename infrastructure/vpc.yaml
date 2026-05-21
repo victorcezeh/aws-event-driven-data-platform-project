@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: VPC and networking infrastructure for the event-driven data platform
+Description: VPC and networking infrastructure for the event-driven data platform project
 
 Resources:
   VPC:
