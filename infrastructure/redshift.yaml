@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Redshift Serverless for the event-driven data platform
+
+Resources:
+  RedshiftSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for data platform Redshift Serverless
+      VpcId: !ImportValue data-platform-vpc-id
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5439
+          ToPort: 5439
+          SourceSecurityGroupId: !ImportValue data-platform-lambda-sg-id
+          Description: Allow inbound from Lambda only
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: Allow HTTPS outbound to AWS services via VPC endpoints
+      Tags:
+        - Key: Name
+          Value: data-platform-redshift-sg
+
+  RedshiftNamespace:
+    Type: AWS::RedshiftServerless::Namespace
+    Properties:
+      NamespaceName: data-platform-namespace
+      DbName: data_platform_db
+      AdminUsername: victorcezeh
+      AdminUserPassword: !Sub
+        - "{{resolve:secretsmanager:${SecretArn}:SecretString:password}}"
+        - SecretArn: !ImportValue data-platform-redshift-secret-arn
+      IamRoles:
+        - !ImportValue data-platform-redshift-role-arn
+      Tags:
+        - Key: Name
+          Value: data-platform-namespace
+
+  RedshiftWorkgroup:
+    Type: AWS::RedshiftServerless::Workgroup
+    Properties:
+      WorkgroupName: data-platform-workgroup
+      NamespaceName: !Ref RedshiftNamespace
+      BaseCapacity: 8
+      PubliclyAccessible: false
+      SubnetIds:
+        - !ImportValue data-platform-subnet-private-b
+      SecurityGroupIds:
+        - !Ref RedshiftSecurityGroup
+      Tags:
+        - Key: Name
+          Value: data-platform-workgroup
+
+Outputs:
+  RedshiftWorkgroupEndpoint:
+    Description: Redshift Serverless Workgroup Endpoint
+    Value: !GetAtt RedshiftWorkgroup.Workgroup.Endpoint.Address
+    Export:
+      Name: data-platform-redshift-endpoint
+
+  RedshiftSecurityGroupId:
+    Description: Redshift Security Group ID
+    Value: !Ref RedshiftSecurityGroup
+    Export:
+      Name: data-platform-redshift-sg-id

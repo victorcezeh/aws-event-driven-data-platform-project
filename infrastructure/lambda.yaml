@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Lambda function for the event-driven data platform
+
+Resources:
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for data platform Lambda function
+      VpcId: !ImportValue data-platform-vpc-id
+      SecurityGroupEgress:
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+          Description: Allow HTTPS outbound to AWS services via VPC endpoints
+        - IpProtocol: tcp
+          FromPort: 5439
+          ToPort: 5439
+          CidrIp: 10.16.64.0/20
+          Description: Allow outbound to Redshift in SubnetPrivateB
+      Tags:
+        - Key: Name
+          Value: data-platform-lambda-sg
+
+  DataPlatformProcessor:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: data-platform-processor
+      Runtime: python3.14
+      Handler: handler.process_handler
+      Role: !ImportValue data-platform-lambda-role-arn
+      Code:
+        S3Bucket: data-platform-event-driven-project
+        S3Key: lambda/deployment-package.zip
+      Timeout: 300
+      MemorySize: 256
+      VpcConfig:
+        SubnetIds:
+          - !ImportValue data-platform-subnet-private-a
+        SecurityGroupIds:
+          - !Ref LambdaSecurityGroup
+      Environment:
+        Variables:
+          AWS_BUCKET_NAME: data-platform-event-driven-project
+          AWS_RAW_PREFIX: raw/
+          AWS_PROCESSED_PREFIX: processed/
+      Tags:
+        - Key: Name
+          Value: data-platform-processor
+
+  LambdaS3InvokePermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref DataPlatformProcessor
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: "arn:aws:s3:::data-platform-event-driven-project"
+      SourceAccount: !Ref AWS::AccountId
+
+Outputs:
+  LambdaFunctionArn:
+    Description: Lambda Function ARN
+    Value: !GetAtt DataPlatformProcessor.Arn
+    Export:
+      Name: data-platform-lambda-arn
+
+  LambdaSecurityGroupId:
+    Description: Lambda Security Group ID
+    Value: !Ref LambdaSecurityGroup
+    Export:
+      Name: data-platform-lambda-sg-id
