@@ -1,0 +1,125 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Monitoring and alerting for the event-driven data platform
+
+Resources:
+  PlatformSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: data-platform-alerts
+      Tags:
+        - Key: Name
+          Value: data-platform-alerts
+
+  PlatformSNSSubscription:
+    Type: AWS::SNS::Subscription
+    Properties:
+      TopicArn: !Ref PlatformSNSTopic
+      Protocol: email
+      Endpoint: ezeh_victor@yahoo.com
+
+  LambdaLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/lambda/data-platform-processor
+      RetentionInDays: 30
+
+  RedshiftLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: /aws/redshift/data-platform-namespace
+      RetentionInDays: 30
+
+  LambdaErrorAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: data-platform-lambda-errors
+      AlarmDescription: Triggers when Lambda errors exceed 2
+      Namespace: AWS/Lambda
+      MetricName: Errors
+      Dimensions:
+        - Name: FunctionName
+          Value: data-platform-processor
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 2
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref PlatformSNSTopic
+      TreatMissingData: notBreaching
+
+  LambdaDurationAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: data-platform-lambda-duration
+      AlarmDescription: Triggers when Lambda duration exceeds 240 seconds
+      Namespace: AWS/Lambda
+      MetricName: Duration
+      Dimensions:
+        - Name: FunctionName
+          Value: data-platform-processor
+      Statistic: Maximum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 240000
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref PlatformSNSTopic
+      TreatMissingData: notBreaching
+
+  RedshiftRPUAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: data-platform-redshift-rpu
+      AlarmDescription: Triggers when Redshift RPU usage exceeds 5
+      Namespace: AWS/Redshift-Serverless
+      MetricName: ComputeSeconds
+      Dimensions:
+        - Name: WorkgroupName
+          Value: data-platform-workgroup
+      Statistic: Average
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 5
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref PlatformSNSTopic
+      TreatMissingData: notBreaching
+
+  RedshiftFailedQueriesAlarm:
+    Type: AWS::CloudWatch::Alarm
+    Properties:
+      AlarmName: data-platform-redshift-failed-queries
+      AlarmDescription: Triggers when Redshift has any failed queries
+      Namespace: AWS/Redshift-Serverless
+      MetricName: QueryFailed
+      Dimensions:
+        - Name: WorkgroupName
+          Value: data-platform-workgroup
+      Statistic: Sum
+      Period: 300
+      EvaluationPeriods: 1
+      Threshold: 1
+      ComparisonOperator: GreaterThanOrEqualToThreshold
+      AlarmActions:
+        - !Ref PlatformSNSTopic
+      TreatMissingData: notBreaching
+
+Outputs:
+  SNSTopicArn:
+    Description: SNS Topic ARN for platform alerts
+    Value: !Ref PlatformSNSTopic
+    Export:
+      Name: data-platform-sns-topic-arn
+
+  LambdaLogGroupName:
+    Description: Lambda Log Group Name
+    Value: !Ref LambdaLogGroup
+    Export:
+      Name: data-platform-lambda-log-group
+
+  RedshiftLogGroupName:
+    Description: Redshift Log Group Name
+    Value: !Ref RedshiftLogGroup
+    Export:
+      Name: data-platform-redshift-log-group

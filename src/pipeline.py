@@ -18,10 +18,10 @@ def main():
     # Transform
     df = transform_data(data)
 
-    # Load raw api data into S3, not transformed data
+    # Load the raw api data into S3, not transformed data
     load_to_s3(data, config)
 
-    # Local inspection of processed data using pandas
+    # A local inspection of processed data using pandas
     if df is not None:
         with open(config["raw_json_file_path"], "w") as f:
             json.dump(data, f, indent=2)

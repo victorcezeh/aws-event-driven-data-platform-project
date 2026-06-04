@@ -42,8 +42,8 @@ Resources:
 
               - Effect: Allow
                 Action:
-                  - sns:Publish
-                Resource: !Sub "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:data-platform-*"
+                  - redshift-serverless:GetWorkgroup
+                Resource: !Sub "arn:${AWS::Partition}:redshift-serverless:${AWS::Region}:${AWS::AccountId}:workgroup/*"
 
   RedshiftS3Role:
     Type: AWS::IAM::Role
@@ -77,11 +77,6 @@ Resources:
                   - logs:CreateLogStream
                   - logs:PutLogEvents
                 Resource: !Sub "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/redshift/*"
-
-              - Effect: Allow
-                Action:
-                  - sns:Publish
-                Resource: !Sub "arn:${AWS::Partition}:sns:${AWS::Region}:${AWS::AccountId}:data-platform-*"
 
 Outputs:
   LambdaExecutionRoleArn:

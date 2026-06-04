@@ -44,6 +44,7 @@ Resources:
           AWS_BUCKET_NAME: data-platform-event-driven-project
           AWS_RAW_PREFIX: raw/
           AWS_PROCESSED_PREFIX: processed/
+          REDSHIFT_IAM_ROLE: !ImportValue data-platform-redshift-role-arn
       Tags:
         - Key: Name
           Value: data-platform-processor

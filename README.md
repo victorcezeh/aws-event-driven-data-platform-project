@@ -1,36 +1,24 @@
 # aws-event-driven-data-platform
 
-## Project Structure (prototype) -> This project is still in progress while preping for my AWS SAA 😁
+> Project status: In progress — built alongside AWS SAA exam prep 😁
 
-```
-aws-data-pipeline-starter/
-│
-├── infrastructure/                  # CloudFormation stacks
-│   ├── main_stack.yaml              # Root stack — orchestrates all nested stacks
-│   ├── vpc.yaml                     # VPC, private/public subnets, security groups
-│   ├── iam.yaml                     # Roles and permissions
-│   ├── s3.yaml                      # S3 buckets and event notification config
-│   ├── lambda.yaml                  # Lambda function, trigger, and VPC config
-│   └── redshift.yaml                # Redshift cluster and table setup
-│
-├── lambdas/
-│   └── process_handler.py           # Lambda entrypoint: reads S3 → transforms → loads Redshift
-│
-├── src/                             # Reusable modules
-│   ├── __init__.py
-│   ├── api_fetcher.py               # Calls the external API
-│   ├── s3_writer.py                 # Writes raw JSON to S3 (runs locally)
-│   ├── s3_reader.py                 # Fetches S3 object content (used by Lambda)
-│   ├── transformer.py               # Transforms raw data before loading (used by Lambda)
-│   ├── redshift_writer.py           # Executes COPY command into Redshift (used by Lambda)
-│   ├── config.py                    # Environment variable helpers and constants
-│   └── logging_config.py            # Logging setup
-│
-├── logs/
-│   └── log_file
-│
-├── .env
-├── .gitignore
-├── requirements.txt
-└── README.md
-```
+## Context
+
+This project started as a way to make my AWS SAA studying concrete. Instead of just reading about S3, VPC, IAM, and CloudFormation, I wanted to actually build something with them; something that resembles a real production data platform.
+
+The result is an event-driven pipeline that ingests raw JSON from an external API, processes it with AWS Lambda inside a private VPC, and loads the results into a Redshift Serverless data warehouse. Fully provisioned with CloudFormation.
+
+## Infrastructure
+
+Each stack is purpose-built and independently deployable via `main_stack.yaml`.
+
+| Stack | Description |
+|-------|-------------|
+| `vpc.yaml` | Private VPC, subnets across two AZs, route tables, and VPC endpoints for S3, Secrets Manager, CloudWatch, and SNS |
+| `iam_role.yaml` | Least-privilege IAM roles for Lambda and Redshift |
+| `s3.yaml` | Single bucket with raw and processed prefixes, versioning, HTTPS enforcement, and S3 event notification to trigger Lambda |
+| `secrets_manager.yaml` | Auto-generated Redshift credentials stored encrypted at rest |
+| `lambda.yaml` | Python 3.14 Lambda function with VPC config, security group, and environment variables |
+| `redshift.yaml` | Redshift Serverless namespace and workgroup with private subnet placement |
+| `monitoring.yaml` | CloudWatch log groups, metric alarms, SNS topic, and email alerting |
+| `main_stack.yaml` | Nested stack orchestrator — deploys all stacks in correct dependency order |

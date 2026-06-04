@@ -11,6 +11,7 @@ def get_config():
         "bucket_region": os.getenv("AWS_REGION"),
         "s3_raw_prefix": os.getenv("AWS_RAW_PREFIX"),
         "s3_processed_prefix": os.getenv("AWS_PROCESSED_PREFIX"),
+        "redshift_iam_role": os.getenv("REDSHIFT_IAM_ROLE"),
         "url": f"{os.getenv('BASE_URL')}{os.getenv('END_POINT')}",
         "log_file": os.getenv("LOG_FILE_PATH"),
         "processed_csv_file_path": os.getenv("PROCESSED_CSV_FILE_PATH"),

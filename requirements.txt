@@ -26,6 +26,7 @@ packaging==26.2
 pandas==3.0.2
 pathspec==1.1.1
 platformdirs==4.9.6
+psycopg2-binary==2.9.12
 pydantic==2.13.4
 pydantic_core==2.46.4
 python-dateutil==2.9.0.post0
