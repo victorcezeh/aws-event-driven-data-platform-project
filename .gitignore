@@ -2,7 +2,7 @@
 .env
 __pycache__
 data
-aws-event-driven-data-platform-project-architecture.gif
-architecture-black-prototype.png
-architecture-white-prototype.png
+aws-event-driven-data-platform-project-architecture-v1.gif
+architecture-black-prototype-v1.png
+architecture-white-prototype-v1.png
 excalidraw.png
