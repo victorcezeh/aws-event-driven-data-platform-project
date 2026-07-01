@@ -19,3 +19,7 @@ class TestLoadToS3(unittest.TestCase):
         load_to_s3(api_data, config)
 
         mock_s3.put_object.assert_called_once()
+
+
+if __name__ == "__main__":
+    unittest.main()
