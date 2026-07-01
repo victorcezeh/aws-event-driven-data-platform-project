@@ -27,7 +27,7 @@ def load_to_redshift(transformed_data):
     config = get_config()
 
     if transformed_data is None or transformed_data.empty:
-        logger.warning("No data to load into Redshift")
+        logger.warning("No data to load into Redshift!")
         return
 
     filename = f"processed-data_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
